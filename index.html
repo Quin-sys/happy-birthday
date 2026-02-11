@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM: BIRTHDAY PROTOCOL</title>
+    <style>
+        /* --- 全局样式 & 字体 --- */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --bg-color: #0a0a12;
+            --primary-color: #00f3ff; /* 霓虹蓝 */
+            --secondary-color: #bc13fe; /* 赛博紫 */
+            --text-color: #e0e0e0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(0, 243, 255, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- 故障文字效果 --- */
+        .glitch-text {
+            position: relative;
+            color: var(--text-color);
+            font-size: 3rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            animation: glitch-skew 3s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(12px, 9999px, 32px, 0); }
+            20% { clip: rect(65px, 9999px, 80px, 0); }
+            40% { clip: rect(22px, 9999px, 6px, 0); }
+            60% { clip: rect(54px, 9999px, 14px, 0); }
+            80% { clip: rect(18px, 9999px, 92px, 0); }
+            100% { clip: rect(2px, 9999px, 55px, 0); }
+        }
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            100% { clip: rect(5px, 9999px, 40px, 0); }
+        }
+
+        /* --- 布局容器 --- */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+        }
+
+        section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+            padding-bottom: 80px;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- 第一屏：开场 --- */
+        #hero {
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%);
+            position: relative;
+        }
+
+        .terminal-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .terminal-line::before {
+            content: '> ';
+            color: var(--primary-color);
+        }
+
+        .cat-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 30px var(--primary-color);
+            object-fit: cover;
+            margin: 20px auto;
+            animation: breathe 3s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .btn-start {
+            padding: 15px 40px;
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            font-family: inherit;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 100px;
+        }
+
+        .btn-start:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 30px var(--primary-color);
+        }
+
+        /* --- 第二屏：成就系统 --- */
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .achievement-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            transition: 0.3s;
+            cursor: default;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.3);
+        }
+
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .desc {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* --- 第三屏：祝福 --- */
+        .desc-text {
+            font-size: 1.1rem;
+            color: #ccc;
+            margin-bottom: 20px;
+            text-align: left; /* 默认左对齐，符合代码风 */
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        /* --- 底部 --- */
+        footer {
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #555;
+            text-align: center;
+            background-color: var(--bg-color);
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        /* --- 响应式 --- */
+        @media (max-width: 600px) {
+            .glitch-text { font-size: 2rem; }
+            .terminal-box { font-size: 0.9rem; }
+            .achievement-grid { grid-template-columns: 1fr; }
+            .btn-start { margin-bottom: 50px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 第一屏：开场 -->
+        <section id="hero">
+            <img src="boss_cat.jpg.jpg" alt="八块Boss" class="cat-avatar" onerror="this.src='boss_cat.jpg.jpg'; this.title='boss_cat.jpg.jpg';">
+            
+            <div class="terminal-box" id="terminal-content">
+                <div class="terminal-line">正在初始化生日协议...</div>
+            </div>
+
+            <button class="btn-start" onclick="startJourney()">启动系统</button>
+        </section>
+
+        <!-- 第二屏：成就统计 -->
+        <section id="achievements">
+            <h2 class="glitch-text" data-text="年度铲屎官报告">年度铲屎官报告</h2>
+            <p style="color: #888; margin-top: 10px;">对象：时龙闽</p>
+
+            <div class="achievement-grid">
+                <div class="achievement-card">
+                    <span class="icon">🏆</span>
+                    <div class="title">[耐力持久]</div>
+                    <div class="desc">连续忍受 八块Boss 凌晨3点跑酷攻击，且未将其扔出窗外。</div>
+                </div>
+                <div class="achievement-card">
+                    <span class="icon">💸</span>
+                    <div class="title">[金钱粉碎者]</div>
+                    <div class="desc">为 八块Boss 购买的罐头总金额超过了自己的买键盘预算。</div>
+                </div>
+                <div class="achievement-card">
+                    <span class="icon">🛌</span>
+                    <div class="title">[人肉靠垫]</div>
+                    <div class="desc">累计被主子当作枕头使用时长超过 500 小时。</div>
+                </div>
+                <div class="achievement-card">
+                    <span class="icon">👕</span>
+                    <div class="title">[行走的猫抓板]</div>
+                    <div class="desc">黑毛衣上沾满猫毛，成功伪装成“渐变色”高级时装。</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第三屏：未来展望与祝福 -->
+        <section id="blessing">
+            <div style="max-width: 600px; width: 100%; background: rgba(255,255,255,0.05); padding: 30px; border-left: 4px solid var(--secondary-color);">
+                <h3 style="color: var(--secondary-color); margin-bottom: 20px; text-align: left;">>>> 系统预测：下一年度</h3>
+                
+                <!-- 保留的预测描述 -->
+                <p class="desc-text">
+                    检测到铲屎官 时龙闽 忠诚度依然在线。<br>
+                    新的系统周期已开启。<br><br>
+                    愿你：<br>
+                </p>
+
+                <!-- 修改后的祝福语：格式完全一致，使用普通 p 标签 -->
+                <p class="desc-text">
+                    岁岁常欢愉，<br>
+                    年年皆胜意，<br>
+                    生辰迎新岁
+                </p>
+
+                <!-- 保留的结尾 -->
+                <p class="desc-text" style="margin-top: 20px; font-style: italic; font-size: 1rem;">
+                    继续做 八块Boss 那个帅气的铲屎官吧！
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        祝时龙闽生日快乐，新年快乐！<br>
+        制作于 2026年2月12日 ❤
+    </footer>
+
+    <script>
+        const terminalContent = document.getElementById('terminal-content');
+        const lines = [
+            "正在连接生物神经网络...",
+            "加载 八块Boss 的傲娇数据...",
+            "检测到目标对象：时龙闽",
+            "状态：生存等级 +1",
+            "所有系统正常。生日快乐。"
+        ];
+
+        let lineIndex = 0;
+        let charIndex = 0;
+        let currentLine = '';
+
+        function typeWriter() {
+            if (lineIndex < lines.length) {
+                if (charIndex === 0) {
+                    const div = document.createElement('div');
+                    div.className = 'terminal-line';
+                    div.id = `line-${lineIndex}`;
+                    terminalContent.appendChild(div);
+                }
+
+                const lineElement = document.getElementById(`line-${lineIndex}`);
+                const text = lines[lineIndex];
+                
+                if (charIndex < text.length) {
+                    lineElement.textContent = text.substring(0, charIndex + 1);
+                    charIndex++;
+                    setTimeout(typeWriter, 50 + Math.random() * 50);
+                } else {
+                    lineIndex++;
+                    charIndex = 0;
+                    setTimeout(typeWriter, 300);
+                }
+            }
+        }
+
+        const observerOptions = { threshold: 0.2 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        function startJourney() {
+            document.getElementById('achievements').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.onload = typeWriter;
+
+    </script>
+</body>
+</html>
